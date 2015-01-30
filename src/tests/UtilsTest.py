@@ -9,7 +9,7 @@ from statics.Utils import *
 class Test(unittest.TestCase):
 
 
-    def testMD5(self):
+    def test_MD5(self):
         self.assertEqual(get_md5("alireza"), "d41d8cd98f00b204e9800998ecf8427e",
                           "md5 not working on 'alireza' test")
 
