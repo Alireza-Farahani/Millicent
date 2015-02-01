@@ -27,4 +27,7 @@ class Network():
         
     def generate_id(self):
         self.last_id += 1
-        return self.last_id    
+        return self.last_id
+    
+    def broker_id(self):
+        return self.broker.id    

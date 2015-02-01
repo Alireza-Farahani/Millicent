@@ -3,10 +3,12 @@ Created on Jan 30, 2015
 
 @author: AlirezaF
 '''
+from statics.Utils import *
 
 class Scrip():
     '''
     Base class for Scrip
+    if vendor is not set (empty string as ""), means its a broker scrip
     '''
 
 
@@ -22,8 +24,11 @@ class Scrip():
         self.id = id
         self.cust_id = cust_id
         self.expiry = expiry
+        self.certificate = self.get_certificate()
         
         # value of this scrip
         self.amount = amount
-    
         
+    
+    def get_certificate(self):
+        return get_md5([self.vendor, self.id, self.cust_id, self.expiry])    
