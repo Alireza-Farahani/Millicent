@@ -5,6 +5,8 @@ Created on Jan 30, 2015
 '''
 from statics.Utils import get_md5
 
+import json
+
 class Scrip():
     '''
     Base class for Scrip
@@ -34,5 +36,9 @@ class Scrip():
         return get_md5(str(self.vendor_id), str(self.amount), str(self.id), str(self.cust_id), str(self.expiry))    
 
     def __str__(self):
-        return str(self.vendor_id) + '&' + str(self.amount) + '&' + str(self.id) + '&' +\
-             str(self.cust_id) + '&' + str(self.expiry) + '&' + str(self.certificate)
+#         return str(self.vendor_id) + '&' + str(self.amount) + '&' + str(self.id) + '&' +\
+#              str(self.cust_id) + '&' + str(self.expiry) + '&' + str(self.certificate)
+        return json.dumps({'vendor': str(self.vendor), 'id' :str(self.id),
+                           'cust_id':str(self.cust_id), 'expiry':str(self.expiry),
+                           'certificate': str(self.certificate)
+        })
