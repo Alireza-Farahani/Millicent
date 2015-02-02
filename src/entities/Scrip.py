@@ -3,7 +3,7 @@ Created on Jan 30, 2015
 
 @author: AlirezaF
 '''
-from statics.Utils import *
+from statics.Utils import get_md5
 
 class Scrip():
     '''
@@ -12,7 +12,7 @@ class Scrip():
     '''
 
 
-    def __init__(self, vendor, id, cust_id, expiry, amount, info=None):
+    def __init__(self, vendor_id, id, cust_id, expiry, amount, info=None):
         '''
         Create a new Scrip from given parameters.
         Info is a optional parameter containing some information
@@ -20,19 +20,19 @@ class Scrip():
         '''
         
         # parameters used in certificate hash
-        self.vendor = vendor
+        self.vendor_id = vendor_id
+        # value of this scrip
+        self.amount = amount
         self.id = id
         self.cust_id = cust_id
         self.expiry = expiry
         self.certificate = self.get_certificate()
         
-        # value of this scrip
-        self.amount = amount
         
     
     def get_certificate(self):
-        return get_md5([self.vendor, self.id, self.cust_id, self.expiry])    
+        return get_md5(str(self.vendor_id), str(self.amount), str(self.id), str(self.cust_id), str(self.expiry))    
 
     def __str__(self):
-        return str(self.vendor) + '&' + str(self.id) + '&' +\
+        return str(self.vendor_id) + '&' + str(self.amount) + '&' + str(self.id) + '&' +\
              str(self.cust_id) + '&' + str(self.expiry) + '&' + str(self.certificate)
