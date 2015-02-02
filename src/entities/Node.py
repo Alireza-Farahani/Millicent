@@ -9,8 +9,10 @@ from random import randrange
 from Crypto.Random.random import sample
 from entities.Network import *
 from time import time
-from statics.Utils import get_hmac, get_md5, is_scrip_valid
-
+from statics.Utils import get_md5, get_hmac, is_scrip_valid, encrypt_message, join_list
+import uuid
+import rsa
+import os
 
 #===============================================================================
 # Node
@@ -20,6 +22,10 @@ class Node():
     Base class for a node in network. A node can be one of the customer, vendor or broker
     '''
 
+    RSA_CRYPTO = 'RSA'
+    AES_CRYPTO = 'AES'
+    DES_CRYPTO = 'DES'
+
     def __init__(self, network, net_id):
         '''
         net_id is the unique id of this node in network
@@ -27,15 +33,17 @@ class Node():
         self.network = network
         self.id = net_id
         
-    #TODO encode thing
-    def send_msg(self, message):
+    def send_msg(self, message, crypto=None, key=None):
         '''
         sends the message into network. receiver
-        ''' 
+        '''
+
+        if crypto:
+            message = encrypt_message(message, crypto, key, iv=os.urandom(8) if crypto == Node.DES_CRYPTO else '')
+
         # self.network.deliver_msg(message)
         pass    
 
-    #TODO decode thing
     def receive_msg(self, message):
         self.process_msg(message)    
     
@@ -231,9 +239,6 @@ class Customer(Node):
                 
         
     
-    
-    
-    
 #===============================================================================
 # VENDOR  
 #===============================================================================
@@ -254,6 +259,13 @@ class Vendor(Node):
         self.master_scrips = []
         self.master_customers = []
     
+
+        (pubkey, privkey) = rsa.newkeys(1024, poolsize=4)
+        self.send_msg(pubkey)
+        self.send_msg(join_list(self.mss, header='MasterScripSecret'), crypto=Node.RSA_CRYPTO, key=privkey)
+        self.send_msg(join_list(self.mcs, header='MasterCustomerSecret'), crypto=Node.RSA_CRYPTO, key=privkey)
+
+
     def create_product(self):
         self.products = [self.product() for i in range(100)]
     
@@ -264,17 +276,28 @@ class Vendor(Node):
         '''
         creates ten random integer as Master Scrip secrets.
         '''
-        self.mss = sample(randrange(0, 0xFFFFFFFF), 10) 
+        mss = []
+
+        for i in range(10):
+            mss.append(str(uuid.uuid4()))
+
+        self.mss = mss
         
         
     def create_mcs(self):
         '''
         creates ten random integer as Master customer secrets.
         '''
-        self.mss = sample(randrange(0, 0xFFFFFFFF), 10)
-        
+        mcs = []
+
+        for i in range(10):
+            mcs.append(str(uuid.uuid4()))
+
+        self.mcs = mcs
+
 
     def process_msg(self, message):
+        self.get_expiry()
         msg = Node.process_msg(self, message)
         cust_id = msg["sender"]
         
@@ -290,8 +313,9 @@ class Vendor(Node):
             self.used_scrips.append(vendor_scrip.id)
             
             self.send_msg(ResponBuyProduct(self.id, cust_id, vendor_change_scrip, self.products.pop()))
-    
-    
+
+
+
     def get_expiry(self):
         return int(time() + self.vendor_expiry)
     
@@ -326,4 +350,6 @@ class Track(Product):
     
 class Service(Product):
     name = "service"
-    price = "5"  # in cents               
+    price = "5"  # in cents
+
+
