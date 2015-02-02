@@ -6,7 +6,6 @@ Created on Jan 30, 2015
 from random import *
 from entities.Node import *
 
-
 class Network():
     '''
     Networks concluding customers, vendors and broker nodes.
