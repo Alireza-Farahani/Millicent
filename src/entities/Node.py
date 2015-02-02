@@ -26,14 +26,15 @@ class Node():
         self.network = network
         self.id = net_id
         
-        
+    #TODO encode thing
     def send_msg(self, message):
         '''
         sends the message into network. receiver
         ''' 
         # self.network.deliver_msg(message)
         pass    
-        
+
+    #TODO decode thing
     def receive_msg(self, message):
         self.process_msg(message)    
     
@@ -60,7 +61,7 @@ class Broker(Node):
     Knows vendors in network and has their secret keys
     Customer buy broker Scrip by sending request and receiving Scrip in plain text.
     '''
-    broker_expiry = 120 # in term of seconds
+    broker_expiry = 120 # in seconds
     vendor_expiry = 60 
     
     def __init__(self, network, net_id, vendors):
@@ -246,7 +247,7 @@ class Vendor(Node):
         '''
         self.mss = sample(randrange(0, 0xFFFFFFFF), 10)
         
-        
+
     def process_msg(self, message):
         msg = Node.process_msg(self, message)
         cust_id = msg["sender"]

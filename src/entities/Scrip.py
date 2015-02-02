@@ -5,6 +5,8 @@ Created on Jan 30, 2015
 '''
 from statics.Utils import *
 
+import json
+
 class Scrip():
     '''
     Base class for Scrip
@@ -12,7 +14,7 @@ class Scrip():
     '''
 
 
-    def __init__(self, vendor, id, cust_id, expiry, amount, info=None):
+    def __init__(self, vendor, id, cust_id, expiry, amount, ijnfo=None):
         '''
         Create a new Scrip from given parameters.
         Info is a optional parameter containing some information
@@ -34,5 +36,7 @@ class Scrip():
         return get_md5([self.vendor, self.id, self.cust_id, self.expiry])    
 
     def __str__(self):
-        return str(self.vendor) + '&' + str(self.id) + '&' +\
-             str(self.cust_id) + '&' + str(self.expiry) + '&' + str(self.certificate)
+        return json.dumps({'vendor': str(self.vendor), 'id' :str(self.id),
+                           'cust_id':str(self.cust_id), 'expiry':str(self.expiry),
+                           'certificate': str(self.certificate)
+        })
