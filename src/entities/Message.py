@@ -40,8 +40,8 @@ class RequestBrokerScrip(Message):
     Contains customer_ID and value of scrip he wants to buy.
     '''        
     
-    def __init__(self, cust_id, broker_id, amount):
-        Message.__init__(self, cust_id, broker_id)
+    def __init__(self, sender, receiver, amount):
+        Message.__init__(self, sender, receiver)
         self.amount = amount
         
     def __str__(self):
@@ -58,8 +58,8 @@ class ResponseBrokerScrip(Message):
     Contains customer_ID and value of scrip he wants to buy.
     '''        
     
-    def __init__(self, broker_id, cust_id, scrip): # scrip in string format
-        Message.__init__(self, cust_id, broker_id)
+    def __init__(self, sender, receiver, scrip): # scrip in string format
+        Message.__init__(self, sender, receiver)
         self.scrip = scrip
         
     def __str__(self):
@@ -76,8 +76,8 @@ class RequestVendorScrip(Message):
     Contains customer_ID and value of scrip he wants to buy and vendor ID.
     '''        
     
-    def __init__(self, cust_id, broker_id, vendor_id, amount, broker_scrip):
-        Message.__init__(self, cust_id, broker_id)
+    def __init__(self, sender, receiver, vendor_id, amount, broker_scrip):
+        Message.__init__(self, sender, receiver)
         self.vendor_id = vendor_id
         self.amount = amount
         self.broker_scrip = broker_scrip
@@ -98,9 +98,9 @@ class ResponseVendorScrip(Message):
     Contains customer_ID and value of scrip he wants to buy.
     '''        
     
-    def __init__(self, broker_id, cust_id, vendor_scrip, broker_change_scrip = None):
+    def __init__(self, sender, receiver, vendor_scrip, broker_change_scrip = None):
         # scrip in string format
-        Message.__init__(self, broker_id, cust_id)
+        Message.__init__(self, sender, receiver)
         self.vendor_scrip = vendor_scrip
         self.broker_change_scrip = broker_change_scrip
         

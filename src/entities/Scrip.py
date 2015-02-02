@@ -3,7 +3,6 @@ Created on Jan 30, 2015
 
 @author: AlirezaF
 '''
-from statics.Utils import get_md5
 
 import json
 
@@ -14,7 +13,7 @@ class Scrip():
     '''
 
 
-    def __init__(self, vendor_id, id, cust_id, expiry, amount, certificate = None, info=None):
+    def __init__(self, vendor_id, id, cust_id, expiry, amount, certificate=None, info=None):
         '''
         Create a new Scrip from given parameters.
         Info is a optional parameter containing some information

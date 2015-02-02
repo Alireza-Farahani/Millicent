@@ -7,7 +7,6 @@ from entities.Message import *
 from entities.Scrip import *
 from random import randrange
 from Crypto.Random.random import sample
-from entities.Network import *
 from time import time
 from statics.Utils import get_md5, get_hmac, is_scrip_valid, encrypt_message, join_list
 import uuid
