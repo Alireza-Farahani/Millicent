@@ -62,6 +62,3 @@ def get_md5(*args):
         else:
             m.update(arg)
     return md5().hexdigest()
-
-
-print(get_md5("alireza"))
