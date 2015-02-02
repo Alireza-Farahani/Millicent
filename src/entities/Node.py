@@ -97,19 +97,19 @@ class Broker(Node):
             vendor_scrip_amount = self.parse_scrip(msg["data"][1])
             broker_scrip = self.parse_scrip(msg["data"][2])
             cust_id = msg["sender"]
-            
+
             vendor_scrip = Scrip(vendor_id, self.generate_scripID(), cust_id, self.get_expiry(), vendor_scrip_amount)
-            
+
             broker_change_scrip = Scrip("", self.generate_scripID(), cust_id, self.get_broker_expiry(), broker_scrip.amount - vendor_scrip_amount)
-            
+
             self.used_scripsIDs.append(broker_scrip.id)
-            
-            
-            self.send_msg(ResponseVendorScrip(self.id, cust_id, vendor_scrip, broker_change_scrip))    
-        
+
+
+            self.send_msg(ResponseVendorScrip(self.id, cust_id, vendor_scrip, broker_change_scrip))
+
     def get_broker_expiry(self):
         return int(time() + self.broker_expiry) # a scrip lasts for only 10 minute
-    
+
     def get_vendor_expiry(self):
         return int(time() + self.vendor_expiry)
     
@@ -290,10 +290,6 @@ class Vendor(Node):
     def get_expiry(self):
         return int(time() + self.vendor_expiry)
     
-        
-        
-
-#===============================================================================
 # Products
 #===============================================================================
 class Product:
@@ -304,7 +300,7 @@ class Product:
 #         __name = name
 #         __price = price
 #     name = __name
-#     price = __price    
+#     price = __price
 
 class Book(Product):
     name = "book"

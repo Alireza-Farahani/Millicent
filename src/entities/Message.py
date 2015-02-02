@@ -4,6 +4,8 @@ Created on Jan 30, 2015
 @author: AlirezaF
 '''
 
+import json
+
 class Message():
     '''
     Base class for all of the messages exchanged in network.
@@ -26,6 +28,9 @@ class Message():
     def __str__(self):
         return type(self).__name__ + self.dash + str(self.sender) + self.dash + str(self.receiver) + self.dash      
 
+
+    def as_json(self):
+        return "#TODO - FJ, Impelement it"
 
 
 class RequestBrokerScrip(Message):
