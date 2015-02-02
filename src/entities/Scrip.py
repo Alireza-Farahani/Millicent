@@ -33,6 +33,9 @@ class Scrip():
         
     def set_certificate(self, certificate):
         self.certificate = certificate
+    
+    def set_customer_secret(self, customer_secret):
+        self.customer_secret = customer_secret
         
 #     def get_certificate(self):
 #         return get_md5(str(self.vendor_id), str(self.amount), str(self.id), str(self.cust_id), str(self.expiry))    
@@ -40,8 +43,12 @@ class Scrip():
     def __str__(self):
 #         return str(self.vendor_id) + '&' + str(self.amount) + '&' + str(self.id) + '&' +\
 #              str(self.cust_id) + '&' + str(self.expiry) + '&' + str(self.certificate)
-        return json.dumps({'vendor_id': str(self.vendor_id), 'amount': str(self.amount), 'id' :str(self.id),
+        scrip_dict = {
+                           'vendor_id': str(self.vendor_id), 'amount': str(self.amount), 'id' :str(self.id),
                            'cust_id':str(self.cust_id), 'expiry':str(self.expiry),
                            'certificate': str(self.certificate)
-        })
+        }
+        if hasattr(self, 'customer_secret'):
+            scrip_dict['customer_secret'] = str(self.customer_secret) 
+        return json.dumps()
         
