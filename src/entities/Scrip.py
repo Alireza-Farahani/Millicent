@@ -32,3 +32,7 @@ class Scrip():
     
     def get_certificate(self):
         return get_md5([self.vendor, self.id, self.cust_id, self.expiry])    
+
+    def __str__(self):
+        return str(self.vendor) + '&' + str(self.id) + '&' +\
+             str(self.cust_id) + '&' + str(self.expiry) + '&' + str(self.certificate)

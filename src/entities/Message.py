@@ -100,12 +100,13 @@ class RequestProducInfo(Message):
 class ResponseProductInfo(Message):
     '''
     '''
-    
     def __init__(self, vendor_id, customer_id, product_name, product_price):
         Message.__init__(self, vendor_id, customer_id)
         self.product_name = product_name 
         self.product_price = product_price
         
+    def __str__(self):
+        return Message.__str__(self) + str(self.product_name) + self.data_seg + str(self.product_price)
 
 
 class RequestBuyProduct(Message):
@@ -114,17 +115,23 @@ class RequestBuyProduct(Message):
     and buys the actual product. 
     '''
     
-    def __init__(self, cust_id, vendor_id, scrip): # number of products to buy will be
+    def __init__(self, cust_id, vendor_id, vendor_scrip): # number of products to buy will be
         Message.__init__(self, cust_id, vendor_id) # implemented. scrip in string format.
-        self.scrip = scrip
+        self.vendor_scrip = vendor_scrip
         
-
+    def __str__(self):
+        return Message.__str__(self) + str(self.vendor_scrip)
+    
+    
 class ResponBuyProduct(Message):
     '''
     Message containing the product itself and change in form of new scrip. 
     '''
     
-    def __init__(self, vendor_id, cust_id, scrip, product): # number of products to buy will be
+    def __init__(self, vendor_id, cust_id, product, change_scrip): # number of products to buy will be
         Message.__init__(self, cust_id, vendor_id) # implemented. scrip in string format.
-        self.scrip = scrip
-        self.product = product # product is a instance object.                             
+        self.change_scrip = change_scrip
+        self.product = product # product is a instance object.         
+    
+    def __str__(self):
+        return Message.__str__(self) + str(self.product) + self.data_seg + str(self.change_scrip)                   
