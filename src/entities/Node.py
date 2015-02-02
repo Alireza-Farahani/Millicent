@@ -7,8 +7,9 @@ from entities.Message import *
 from entities.Scrip import *
 from random import randrange
 from Crypto.Random.random import sample
-from entities.Network import Network
+from entities.Network import *
 from time import time
+from statics.Utils import get_hmac
 
 
 #===============================================================================
@@ -49,7 +50,8 @@ class Node():
     
     def parse_scrip(self, string):
         # TODO: parse scrip from string representation
-        return None
+        j = json.loads(string)
+        return Scrip(j['vendor_id'], j['id'], j['cust_id'], j['expiry'],j['amount'], j['certificate'])
 
 
 #===============================================================================
@@ -76,7 +78,8 @@ class Broker(Node):
         
         if msg["type"] == "RequestBrokerScrip":
             scrip = Scrip("", self.generate_scripID(), msg["sender"],
-                           self.get_broker_expiry(), msg["data"][0], "")
+                           self.get_broker_expiry(), msg["data"][0])
+            scrip.set_certificate(get_md5(scrip))
             
             self.send_msg(ResponseBrokerScrip(self.id, msg["sender"], scrip))
             
@@ -268,7 +271,12 @@ class Vendor(Node):
         return int(time() + self.vendor_expiry)
     
         
-        
+# s = Scrip(123, 456, 789, int(time()), 79)
+# s.set_certificate(get_md5(s))
+# print(str(s))
+# st = Node(None, 234).parse_scrip(str(s))
+# print(st)
+
 
 #===============================================================================
 # Products

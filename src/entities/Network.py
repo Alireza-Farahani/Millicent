@@ -4,7 +4,7 @@ Created on Jan 30, 2015
 @author: AlirezaF
 '''
 from random import *
-from entities.Node import *
+from entities.Node import Vendor, Customer, Broker
 
 
 class Network():
