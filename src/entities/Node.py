@@ -7,8 +7,9 @@ from entities.Message import *
 from entities.Scrip import *
 from random import randrange
 from Crypto.Random.random import sample
-from entities.Network import Network
+from entities.Network import *
 from time import time
+from statics.Utils import get_md5, get_hmac, is_scrip_valid, encrypt_message, join_list
 import uuid
 import rsa
 import os
@@ -57,7 +58,8 @@ class Node():
     
     def parse_scrip(self, string):
         # TODO: parse scrip from string representation
-        return None
+        j = json.loads(string)
+        return Scrip(j['vendor_id'], j['id'], j['cust_id'], j['expiry'],j['amount'], j['certificate'])
 
 
 #===============================================================================
@@ -78,13 +80,16 @@ class Broker(Node):
         
         self.valid_scripsIDs = sample(range(0, 0xFFFFFFFF), 1000)
         self.used_scripsIDs = []
+        self.master_scrips = [] # length of ten
+        self.master_customers = [] # length of ten
     
     def process_msg(self, message):
         msg = Node.process_msg(self, message)
         
         if msg["type"] == "RequestBrokerScrip":
             scrip = Scrip("", self.generate_scripID(), msg["sender"],
-                           self.get_broker_expiry(), msg["data"][0], "")
+                           self.get_broker_expiry(), msg["data"][0])
+            scrip.set_certificate(get_md5(scrip))
             
             self.send_msg(ResponseBrokerScrip(self.id, msg["sender"], scrip))
             
@@ -99,14 +104,25 @@ class Broker(Node):
             cust_id = msg["sender"]
 
             vendor_scrip = Scrip(vendor_id, self.generate_scripID(), cust_id, self.get_expiry(), vendor_scrip_amount)
-
+            # secreti ke indexesh raghame akhare cust_ide
+            mss = self.master_scrips[int(cust_id[-1])] 
+            vendor_scrip.set_certificate(get_hmac(mss))
+            
+            
+            mcs = self.master_customer[int(cust_id[-1])]
+            customer_secret = get_hmac(cust_id, mcs)
+            vendor_scrip.set_customer_secret(customer_secret)
+            
             broker_change_scrip = Scrip("", self.generate_scripID(), cust_id, self.get_broker_expiry(), broker_scrip.amount - vendor_scrip_amount)
-
+            broker_change_scrip.set_certificate(get_md5(broker_change_scrip))
+            
             self.used_scripsIDs.append(broker_scrip.id)
-
-
-            self.send_msg(ResponseVendorScrip(self.id, cust_id, vendor_scrip, broker_change_scrip))
-
+            
+            
+            self.send_msg(ResponseVendorScrip(self.id, cust_id, vendor_scrip,
+                                               broker_change_scrip))
+            # self.send_msg(ResponseVendorScrip(self.id, cust_id, hmaced_scrip))    
+        
     def get_broker_expiry(self):
         return int(time() + self.broker_expiry) # a scrip lasts for only 10 minute
 
@@ -124,10 +140,10 @@ class Broker(Node):
   
   
   
-  #=============================================================================
-  # CUSTOMER
-  #=============================================================================
-  
+#=============================================================================
+# CUSTOMER
+#=============================================================================
+
   
 class Customer(Node):
     '''
@@ -193,9 +209,12 @@ class Customer(Node):
             self.money -= scrip.amount
             self.add_broker_scrip(scrip)
             
+            is_scrip_valid(scrip, "md5")
+            
         
         elif msg["type"] == "ResponseVendorScrip":
             vendor_scrip = self.parse_scrip(msg["data"][0])
+            
             self.add_vendor_scrip(vendor_scrip)
             
             broker_change = msg["data"][1]
@@ -232,6 +251,10 @@ class Vendor(Node):
         self.create_mcs() # Master_customer_secret.
         self.used_scrips = []
         self.product = product
+        
+        self.master_scrips = []
+        self.master_customers = []
+    
 
         (pubkey, privkey) = rsa.newkeys(1024, poolsize=4)
         self.send_msg(pubkey)
@@ -279,6 +302,8 @@ class Vendor(Node):
             
         elif msg["type"] == "RequestBuyProduct":
             vendor_scrip = self.parse_scrip(msg["data"][0])
+            mss = self.master_scrips[int(vendor_scrip.cust_id[-1])]
+            is_scrip_valid(vendor_scrip, "hmac", mss)
             
             vendor_change_scrip = Scrip(self.id, cust_id, self.get_expiry(), vendor_scrip.amount - self.product.price)
             self.used_scrips.append(vendor_scrip.id)
@@ -290,8 +315,8 @@ class Vendor(Node):
     def get_expiry(self):
         return int(time() + self.vendor_expiry)
     
-# Products
-#===============================================================================
+
+
 class Product:
     pass
 #     __name = ""

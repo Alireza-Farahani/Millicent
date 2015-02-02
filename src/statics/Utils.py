@@ -5,6 +5,7 @@ Created on Jan 30, 2015
 '''
 
 from hashlib import md5
+import hmac
 from entities.Node import Node
 import rsa
 from Crypto.Cipher import DES
@@ -51,14 +52,33 @@ def decrypt_message(msg, crypto, key, iv=''):
 def join_list(arr, header):
     return header + '|'.join(arr)
 
-
-def get_md5(*args):
+def get_md5(scrip):
     m = md5()
-    for arg in args:
-        # bytes takes iterable objects
-        if (type(arg) == str):
-            # m.update(bytes(list(arg)))
-            m.update(arg.encode())
-        else:
-            m.update(arg)
-    return md5().hexdigest()
+#     for arg in args:
+#         # bytes takes iterable objects
+#         if (type(arg) == str):
+#         # m.update(bytes(list(arg)))
+#             m.update(arg.encode())
+#         else:
+#             m.update(arg)
+    for e in [scrip.vendor_id, scrip.amount, scrip.id, scrip.cust_id, scrip.expiry]:
+        m.update(str(e).encode())    
+    return m.hexdigest()
+
+def get_hmac(key, scrip):
+    m = hmac.new(key.encode(), b'', digestmod=md5)
+    for e in [scrip.vendor_id, scrip.amount, scrip.id, scrip.cust_id, scrip.expiry]:
+        m.update(str(e).encode())
+    return m.hexdigest()
+
+def is_scrip_valid(scrip, type, key=None):
+    # type == md5 -> simple hash
+    # type == hmac -> hmac using secret
+    certif = scrip.certificate
+    if type == "md5":
+        if get_md5(scrip) != certif:
+            raise Exception("bad md5")
+    elif type == "hmac":
+        if get_hmac(key, scrip) != certif:
+            raise Exception("bad hmac")
+
