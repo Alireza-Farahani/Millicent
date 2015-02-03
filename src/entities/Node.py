@@ -21,10 +21,6 @@ class Node():
     Base class for a node in network. A node can be one of the customer, vendor or broker
     '''
 
-    RSA_CRYPTO = 'RSA'
-    AES_CRYPTO = 'AES'
-    DES_CRYPTO = 'DES'
-
     def __init__(self, network, net_id):
         '''
         net_id is the unique id of this node in network
@@ -317,7 +313,8 @@ class Vendor(Node):
 
 
 class Product:
-    pass
+    def __str__(self):
+        return json.dumps({'name': self.name, 'price': self.price})
 #     __name = ""
 #     __price = ""
 #     def set_values(name, price):
@@ -337,5 +334,4 @@ class Track(Product):
 class Service(Product):
     name = "service"
     price = "5"  # in cents
-
 

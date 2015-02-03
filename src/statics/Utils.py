@@ -6,10 +6,15 @@ Created on Jan 30, 2015
 
 from hashlib import md5
 import hmac
-from entities.Node import Node
 import rsa
 from Crypto.Cipher import DES
+import json
+from entities.Scrip import Scrip
 
+
+RSA_CRYPTO = 'RSA'
+AES_CRYPTO = 'AES'
+DES_CRYPTO = 'DES'
 
 def encrypt_message_deco(func):
     def wrapper(*args, **kwargs):
@@ -26,26 +31,26 @@ def decrypt_message_deco(func):
 
 
 def encrypt_message(msg, crypto, key, iv=''):
-    if crypto == Node.RSA_CRYPTO:
+    if crypto == RSA_CRYPTO:
         return rsa.encrypt(msg, key)
 
-    if crypto == Node.DES_CRYPTO:
+    if crypto == DES_CRYPTO:
         cbc_des_cipher = DES.new(key, DES.MODE_CBC, iv)
         return cbc_des_cipher.encrypt(msg)
 
-    if crypto == Node.AES_CRYPTO:
+    if crypto == AES_CRYPTO:
         return "Is it really needed ?"
 
 
 def decrypt_message(msg, crypto, key, iv=''):
-    if crypto == Node.RSA_CRYPTO:
+    if crypto == RSA_CRYPTO:
         return rsa.decrypt(msg, key)
 
-    if crypto == Node.DES_CRYPTO:
+    if crypto == DES_CRYPTO:
         cbc_des_decipher = DES.new(key, DES.MODE_CBC, iv)
         return cbc_des_decipher.decrypt(msg)
 
-    if crypto == Node.AES_CRYPTO:
+    if crypto == AES_CRYPTO:
         return "Is it really needed ?"
 
 
@@ -82,3 +87,7 @@ def is_scrip_valid(scrip, type, key=None):
         if get_hmac(key, scrip) != certif:
             raise Exception("bad hmac")
 
+def parse_scrip(string):
+        # TODO: parse scrip from string representation
+        j = json.loads(string)
+        return Scrip(j['vendor_id'], j['id'], j['cust_id'], j['expiry'],j['amount'], j['certificate'])

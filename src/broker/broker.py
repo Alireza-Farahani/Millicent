@@ -32,7 +32,7 @@ def handle_connection(connection, address, arg):
         scrip = Scrip(vendor_id="", id=generate_scripID(), cust_id=msg.get('sender'),
                       expiry=get_scrip_expiry(), amount=msg["data"][0])
 
-        scrip_packet = ResponseBrokerScrip(id, msg["sender"], scrip)
+        scrip_packet = ResponseBrokerScrip(id, msg["sender"], scrip).as_json() #fj
         send_msg(scrip_packet, connection)
 
 
@@ -49,7 +49,8 @@ def handle_connection(connection, address, arg):
 
         used_scripsIDs.append(broker_scrip.id)
 
-        send_msg(ResponseVendorScrip(id, cust_id, vendor_scrip, broker_change_scrip), connection)
+        send_msg(ResponseVendorScrip(id, cust_id,
+                                      vendor_scrip, broker_change_scrip).as_json(), connection) #fj
 
 
 def connection_ready(sock, fd, events):

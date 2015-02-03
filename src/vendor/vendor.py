@@ -1,3 +1,4 @@
+from entities.Node import Book, Service
 __author__ = 'alirezasadeghi'
 
 import errno
@@ -10,7 +11,10 @@ import sys
 
 vendor_port_number = random.randint(1235, 50000)
 BROKER_PORT = 1234
-
+#===============================================================================
+# fj
+#===============================================================================
+product__ = random.choice(Book, Service, )
 
 def broker_handshake(connection, address, arg):
     print("Initiating the handshake")
